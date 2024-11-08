@@ -1,7 +1,8 @@
 """
 Purpose: The message model stores data about each sent message in the channel.
 
-Why do you need it: This is the main model for saving chat history. It allows you to store text messages and attached files (for example, images), as well as link messages to channels and users.
+Why do you need it: This is the main model for saving chat history. 
+It allows you to store text messages and attached files (for example, images), as well as link messages to channels and users.
 """
 
 from sqlalchemy import Column, String, DateTime, ForeignKey
@@ -9,7 +10,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
-from database import Base
+from app.db.database import Base
 
 class Message(Base):
     __tablename__ = 'messages'

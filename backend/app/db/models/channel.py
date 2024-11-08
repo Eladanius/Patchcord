@@ -1,7 +1,8 @@
 """
 Purpose: The channel model is a "room" or space in which users can communicate.
 
-Why you need it: This model is needed to create and manage channels such as text chats or group chats. Each channel can be public or private, and different users can join it
+Why you need it: This model is needed to create and manage channels such as text chats or group chats. 
+Each channel can be public or private, and different users can join it
 """
 
 from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey
@@ -9,7 +10,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
-from database import Base
+from app.db.database import Base
 
 class Channel(Base):
     __tablename__ = 'channels'

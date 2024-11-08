@@ -1,7 +1,9 @@
 """
 Purpose: The channel participation model describes the relationship between users and channels.
 
-Why you need it: This model allows you to track who is a member of which channel, as well as assign roles within the channel (for example, an administrator or a regular participant). It can be used to manage user rights in different channels.
+Why you need it: This model allows you to track who is a member of which channel, 
+as well as assign roles within the channel (for example, an administrator or a regular participant). 
+It can be used to manage user rights in different channels.
 """
 
 from sqlalchemy import Column, String, DateTime, ForeignKey
@@ -9,7 +11,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
-from database import Base
+from app.db.database import Base
 
 class ChannelMembership(Base):
     __tablename__ = 'channel_memberships'

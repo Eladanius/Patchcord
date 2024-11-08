@@ -1,7 +1,8 @@
 """
 Purpose: The user model stores basic information about each person registered in the system.
 
-Why you need it: This model allows you to manage users, their authentication and profile information, such as avatar and status (online/offline). Users will be associated with messages, channels and roles.
+Why you need it: This model allows you to manage users, their authentication and profile information, 
+such as avatar and status (online/offline). Users will be associated with messages, channels and roles.
 """
 
 from sqlalchemy import Column, String, DateTime, Boolean
@@ -9,7 +10,7 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
-from database import Base
+from app.db.database import Base
 
 class User(Base):
     __tablename__ = 'users'

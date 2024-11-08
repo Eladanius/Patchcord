@@ -1,14 +1,16 @@
 """
-Purpose: The file model stores information about downloaded files, such as images and documents, that can be attached to messages.
+Purpose: The file model stores information about downloaded files, such as images and documents, 
+that can be attached to messages.
 
-Why you need it: This model is needed to track all files uploaded by users and link these files to specific messages. This can be useful for managing storage and simplifying access to media files.
+Why you need it: This model is needed to track all files uploaded by users and link these files to specific messages. 
+This can be useful for managing storage and simplifying access to media files.
 """
 
 from sqlalchemy import Column, String, DateTime, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from datetime import datetime
 import uuid
-from database import Base
+from app.db.database import Base
 
 class File(Base):
     __tablename__ = 'files'
