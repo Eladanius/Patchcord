@@ -1,15 +1,11 @@
-from typing import Union
-
 from fastapi import FastAPI
+import os
+from starlette.middleware.sessions import SessionMiddleware
+
 
 app = FastAPI()
 
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+from app.api.auth.auth_routes import router as AuthRouter
+app.include_router(AuthRouter, tags=["auth"])

@@ -11,15 +11,16 @@ def get_or_create_user(db: Session, user_info: dict) -> User:
     email = user_info.get("email")
     
     # search for a user by Google ID or email
-    user = db.query(User).filter((User.google_id == google_id) | (User.email == email)).first()
-    
+    user = db.query(User).filter(User.email == email).first()
+    print('User:', user)
     if not user:
         # If there is no user, create it
         user = User(
-            google_id=google_id,
             email=email,
             username=user_info.get("name"),
-            avatar_url=user_info.get("picture")
+            avatar_url=user_info.get("picture"),
+            hashed_password=None,
+            auth_provider="google"
         )
         db.add(user)
         db.commit()

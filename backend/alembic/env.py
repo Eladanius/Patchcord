@@ -15,18 +15,8 @@ if config.config_file_name is not None:
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+from app.db import models
 from app.db.database import Base
-from app.db.models import (
-    user,
-    channel,
-    channel_membership,
-    direct_message,
-    file,
-    message,
-    reaction,
-    role,
-    user_status,
-)
 
 target_metadata = Base.metadata
 

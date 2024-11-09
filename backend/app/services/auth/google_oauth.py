@@ -10,10 +10,10 @@ class GoogleOAuthClient(OAuthClient):
             name='google',
             client_id=os.getenv("GOOGLE_CLIENT_ID"),
             client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-            authorize_url='https://accounts.google.com/o/oauth2/auth',
-            access_token_url='https://accounts.google.com/o/oauth2/token',
-            client_kwargs={'scope': 'openid profile email'}
+            server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+            client_kwargs={'scope': 'openid email profile'}
         )
+
 
     async def authorize_redirect(self, request: Request, redirect_uri: str):
         return await self.oauth.google.authorize_redirect(request, redirect_uri)

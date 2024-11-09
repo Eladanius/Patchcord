@@ -5,7 +5,7 @@ Why you need it: This model allows you to manage users, their authentication and
 such as avatar and status (online/offline). Users will be associated with messages, channels and roles.
 """
 
-from sqlalchemy import Column, String, DateTime, Boolean
+from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from datetime import datetime
@@ -18,7 +18,8 @@ class User(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = Column(String, unique=True, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=True)
+    auth_provider = Column(String, default="local")  # "local" для стандартной регистрации, "google" для Google OAuth
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login = Column(DateTime)
     avatar_url = Column(String, nullable=True)
