@@ -15,5 +15,5 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY")
 from app.api.auth.auth_routes import router as AuthRouter
 from app.api.user.user_routes import router as UserRouter
 
-app.include_router(AuthRouter, tags=["auth"])
+app.include_router(AuthRouter, prefix='/auth', tags=["auth"])
 app.include_router(UserRouter, tags=["user"])
