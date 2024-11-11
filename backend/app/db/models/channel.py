@@ -21,6 +21,8 @@ class Channel(Base):
     created_by = Column(UUID(as_uuid=True), ForeignKey('users.id'))
     created_at = Column(DateTime, default=datetime.utcnow)
     topic = Column(String, nullable=True)
+    admin_id = Column(UUID(as_uuid=True), ForeignKey('users.id'))
+    moderator_id = Column(UUID(as_uuid=True), ForeignKey('users.id'), nullable=True)
 
     messages = relationship("Message", back_populates="channel")
     memberships = relationship("ChannelMembership", back_populates="channel")

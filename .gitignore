@@ -3,3 +3,5 @@ node_modules/
 .swc/
 .env
 __pycache__
+poetry.lock
+vscode/
