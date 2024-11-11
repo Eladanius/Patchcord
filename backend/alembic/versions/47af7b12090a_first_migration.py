@@ -1,8 +1,8 @@
 """first migration
 
-Revision ID: 68dcdfbc1d4c
+Revision ID: 47af7b12090a
 Revises: 
-Create Date: 2024-11-10 00:13:51.488458
+Create Date: 2024-11-11 13:53:55.376401
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '68dcdfbc1d4c'
+revision: str = '47af7b12090a'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -27,6 +27,15 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
+    op.create_table('user_statuses',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('status', sa.String(), nullable=False),
+    sa.Column('description', sa.String(), nullable=True),
+    sa.Column('status_color', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('status')
+    )
+    op.create_index(op.f('ix_user_statuses_id'), 'user_statuses', ['id'], unique=False)
     op.create_table('users',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
@@ -36,8 +45,11 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('last_login', sa.DateTime(), nullable=True),
     sa.Column('avatar_url', sa.String(), nullable=True),
-    sa.Column('status', sa.String(), nullable=True),
+    sa.Column('status_id', sa.Integer(), nullable=True),
+    sa.Column('last_status_id', sa.Integer(), nullable=True),
     sa.Column('role', sa.String(), nullable=True),
+    sa.ForeignKeyConstraint(['last_status_id'], ['user_statuses.id'], ),
+    sa.ForeignKeyConstraint(['status_id'], ['user_statuses.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('username')
@@ -61,14 +73,6 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['receiver_id'], ['users.id'], ),
     sa.ForeignKeyConstraint(['sender_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id')
-    )
-    op.create_table('user_status',
-    sa.Column('id', sa.UUID(), nullable=False),
-    sa.Column('user_id', sa.UUID(), nullable=True),
-    sa.Column('status', sa.String(), nullable=True),
-    sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('channel_memberships',
@@ -112,7 +116,25 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+
+    statuses = [
+        {"status": "online", "description": "User is available", "status_color": "#3BA55C"},
+        {"status": "offline", "description": "User is offline", "status_color": "#747F8D"},
+        {"status": "busy", "description": "User is busy", "status_color": "#ED4245"},
+        {"status": "invisible", "description": "User is invisible", "status_color": "#747F8D"},
+    ]
+
+    op.bulk_insert(
+        sa.table(
+            'user_statuses',
+            sa.column("status", sa.String),
+            sa.column("description", sa.String),
+            sa.column("status_color", sa.String)
+        ),
+        statuses
+    )
     # ### end Alembic commands ###
+
 
 
 def downgrade() -> None:
@@ -121,9 +143,10 @@ def downgrade() -> None:
     op.drop_table('files')
     op.drop_table('messages')
     op.drop_table('channel_memberships')
-    op.drop_table('user_status')
     op.drop_table('direct_messages')
     op.drop_table('channels')
     op.drop_table('users')
+    op.drop_index(op.f('ix_user_statuses_id'), table_name='user_statuses')
+    op.drop_table('user_statuses')
     op.drop_table('roles')
     # ### end Alembic commands ###

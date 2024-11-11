@@ -5,9 +5,10 @@ from starlette.requests import Request
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.services.auth.auth_service import AuthService
-from app.db.models import User
+from app.db.models import User, UserStatus
 from app.utils.auth_utils import create_access_token, hash_password, verify_password
 from app.utils.dependencies import get_current_user
+from app.schemas.user_create_request import UserCreateRequest
 
 router = APIRouter()
 auth_service = AuthService()
@@ -39,12 +40,18 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register")
-def register(username: str, email: str, password: str, db: Session = Depends(get_db)):
-    if db.query(User).filter((User.username == username) | (User.email == email)).first():
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username or email already registered")
+def register(user_data: UserCreateRequest, db: Session = Depends(get_db)):
+    if db.query(User).filter(User.email == user_data.email).first():
+        raise HTTPException(status_code=400, detail="Email already registered")
+    if db.query(User).filter(User.username == user_data.username).first():
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+    offline_status = db.query(UserStatus).filter(UserStatus.status == "offline").first()
+    if not offline_status:
+        raise HTTPException(status_code=500, detail="Offline status not found in the database")
 
-    hashed_password = hash_password(password)
-    user = User(username=username, email=email, hashed_password=hashed_password)
+    hashed_password = hash_password(user_data.password.get_secret_value())
+    user = User(username=user_data.username, email=user_data.email, hashed_password=hashed_password, status_id=offline_status.id )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -52,15 +59,13 @@ def register(username: str, email: str, password: str, db: Session = Depends(get
 
 @router.post("/logout")
 async def logout(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    token = request.headers.get("Authorization").split(" ")[1]  # Извлекаем токен из заголовка
+    user.last_status_id = user.status_id
     
-    # Обновляем статус пользователя
-    user.status = "offline"
+    offline_status = db.query(UserStatus).filter(UserStatus.status == "offline").first()
+    if not offline_status:
+        raise HTTPException(status_code=500, detail="Offline status not found in the database")
+
+    user.status_id = offline_status.id
     db.commit()
-    
-    # (Дополнительно) Добавьте токен в чёрный список, если используете его
-    # blacklisted_token = BlacklistedToken(token=token)
-    # db.add(blacklisted_token)
-    # db.commit()
 
     return {"message": "Successfully logged out"}

@@ -5,16 +5,13 @@ Why you need it: This model allows you to display the user's status to other use
 and update it in real time. This helps other users understand if their contacts are available.
 """
 
-from sqlalchemy import Column, String, DateTime, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
-from datetime import datetime
-import uuid
+from sqlalchemy import Column, Integer, String
 from app.db.database import Base
 
 class UserStatus(Base):
-    __tablename__ = 'user_status'
+    __tablename__ = 'user_statuses'
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = Column(UUID(as_uuid=True), ForeignKey('users.id'))
-    status = Column(String, default="offline")
-    updated_at = Column(DateTime, default=datetime.utcnow)
+    id = Column(Integer, primary_key=True, index=True)
+    status = Column(String, unique=True, nullable=False)
+    description = Column(String, nullable=True)
+    status_color = Column(String, nullable=True)

@@ -1,19 +1,21 @@
 from typing import Annotated
 from fastapi import Depends, FastAPI
 import os
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware.sessions import SessionMiddleware
+
+from app.core.exceptions import validation_exception_handler
 
 
 app = FastAPI()
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/google")
-
-
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET_KEY"))
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-from app.api.auth.auth_routes import router as AuthRouter
-from app.api.user.user_routes import router as UserRouter
+from app.api.auth_routes import router as AuthRouter
+from app.api.user_routes import router as UserRouter
+from app.api.status_routes import router as UserStatusRouter
 
 app.include_router(AuthRouter, prefix='/auth', tags=["auth"])
-app.include_router(UserRouter, tags=["user"])
+app.include_router(UserRouter, prefix='/user', tags=["user"])
+app.include_router(UserStatusRouter, prefix='/user_status', tags=["status"])
