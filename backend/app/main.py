@@ -14,8 +14,8 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 from app.api.auth_routes import router as AuthRouter
 from app.api.user_routes import router as UserRouter
-from app.api.status_routes import router as UserStatusRouter
+from app.api.user_statuses_routes import router as UserStatusesRouter
 
 app.include_router(AuthRouter, prefix='/auth', tags=["auth"])
 app.include_router(UserRouter, prefix='/user', tags=["user"])
-app.include_router(UserStatusRouter, prefix='/user_status', tags=["status"])
+app.include_router(UserStatusesRouter, prefix='/user_statuses', tags=["status"])
